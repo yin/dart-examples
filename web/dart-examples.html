@@ -8,7 +8,7 @@
   </head>
   <body>
     <h1>Dart examples</h1>
-    
+
     <p>This site is an example of different features of the Dart language. I
     put it together as an excercise while learning Dart. Dart is not only a
     languge, it's a platform and developement tool-chain. Partially the next
@@ -21,7 +21,7 @@
     eggs. The point of this site is to explore dart and all it's features.
     Additionally, the code is meant to be read much as examples are. The code
     should is written in a particular style, noticable hrough the axamples.</p>
-    
+
     <ul>
       <li><a href="levenstein/levenstein.html">Levenstein distance</a> calculator</li>
       <!--
@@ -49,10 +49,23 @@
       <dt>List&lt;T&gt; trhows RangeError</dt>
       <dd>Use add() method to add elements. A list can be indexed only for
       reading or setting items, not to add new items.</dd>
-      <dt>Construction(a, b) : initializers = a. list = b { /**/ }</dt>
+      <dt>Construction(a, b) : initializers = a, list = b { /**/ }</dt>
       <dd>Final fields have to be initialized before constructor body
       executes. This is achieved using constructor initialize, which are put
       after semicolon just before constructor body.</dd>
+      <dt>Unit testing framework</dt>
+      <dd>For writing unit tests, there is the unittest package, which can be
+      put into dev_dependencies in pubspec.yaml file. Tests are defined using
+      the test() method taking test name and test function as parameter. The
+      test() methods are called from main() function and for browser apps the
+      test script is included into a blank html page, which will be filled with
+      test results.</dd>
+      <dt>Expectation matchers</dt>
+      <dd>Expectations in tests are modelled similarly to hamcrest matchers in
+      Java. There's plenty of expectation matchers.</dd>
+      <dt>Test PASS, FAIL and ERROR</dt>
+      <dd>A test can PASS, or FAIL the expectations. Alternativelly, if an
+      exception is thrown during test execution, the test can result in ERROR.</dd>
     </ul>
 
     <script type="application/dart" src="dart-examples.dart"></script>
