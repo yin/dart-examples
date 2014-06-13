@@ -4,15 +4,27 @@
   <head>
   	<meta charset="utf-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link ref="import" href="packages/polymer/polymer.html">
-    <link ref="import" href="../lib/polymer_graph/">
-    <title>dijkstra</title>
+    <link rel="stylesheet" href="../dart-examples.css">
+    <link rel="import" href="packages/polymer/polymer.html">
+    <link ref="import" href="../lib/graph-canvas/graph-canvas.html">
+    <title>Dart examples - Dijkstra's shortest-path</title>
   </head>
 
   <body>
-    <p id="text"></p>
-    <script type="application/dart" src="dijkstra.dart"></script>
-    <!-- for this next line to work, your pubspec.yaml file must have a dependency on 'browser' -->
-    <script src="packages/browser/dart.js"></script>
+    <h1>Dijkstra's shortest-path</h1>
+    <p>This is a demo of <em>Dijksra's shortest-path</em> algoritm.
+    It includes an example of polymer component, the <code>&lt;graph-canvas&gt;
+    </code>, which allows to create graph structures using mouse, keyboard
+    shortcuts and commands. It also fetures the <b>[TODO]</b><code>
+    &lt;command-input&gt;</code> component, which provides user with an
+    terminal-like interaction experience with the Dart application.</p>
+    <p><code>&lt;graph-canvas&gt;</code> is a canvas, to which I added methods
+    neccessary to create and manipulate graph structures.</p>
+    <div>
+      <graph-canvas id="graph"></graph-canvas>
+    </div>
+    <script type="application/dart">
+      export 'package:polymer/init.dart';
+    </script>
   </body>
 </html>
