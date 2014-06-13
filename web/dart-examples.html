@@ -31,8 +31,13 @@
 
     <h2>TODOs:</h2>
     <ul>
-      <li>Demonstrate #symbols</li>
-      <li>Demonstrate {optional, function, arguments}</li>
+      <li>Demonstrate:
+        <ul>
+          <li>#symbols</li>
+          <li>{optional, function, arguments}</li>
+          <li>Named.constructors()</li>
+        </ul>
+      </li>
     </ul>
 
     <h2>Notes:</h2>
@@ -44,6 +49,10 @@
       <dt>List&lt;T&gt; trhows RangeError</dt>
       <dd>Use add() method to add elements. A list can be indexed only for
       reading or setting items, not to add new items.</dd>
+      <dt>Construction(a, b) : initializers = a. list = b { /**/ }</dt>
+      <dd>Final fields have to be initialized before constructor body
+      executes. This is achieved using constructor initialize, which are put
+      after semicolon just before constructor body.</dd>
     </ul>
 
     <script type="application/dart" src="dart-examples.dart"></script>
