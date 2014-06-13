@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <polymer-element name="graph-canvas">
   <template>
     <style>
@@ -5,7 +7,8 @@
         border: 1px solid #101010;
       }
     </style>
-    <canvas id="graph_canvas" on-click="{{onClick}}">
+    <canvas id="graph_canvas" onmousedown="{{mouseClick}}" onmouseup=""
+        onmousemove="{{mouseMove}}" width="800" height="600">
     </canvas>
   </template>
   <script type="application/dart" src="graph-canvas.dart">
