@@ -1,4 +1,5 @@
-import 'dart:math';
+library graph_model;
+import 'dart:convert' show JSON;
 
 class GraphModel {
   // graphType: #oriented, #bidirectional
@@ -97,6 +98,18 @@ class GraphModel {
       }
     return null;
   }
+
+  String toString() => type + ':' +
+      nodes.map((node) => node.toString()).join(',') + ':' +
+      edges.map((edge) => edge.toString()).join(',');
+  String get type => graphType == #oriented ? 'oriented' :
+                     graphType == #bidirectional ? 'bidirectional' :
+                     'unknown';
+
+  bool fromString(String stored) {
+    throw new UnimplementedError('GraphModel.fromString(String)');
+    return false;
+  }
 }
 
 
@@ -105,10 +118,9 @@ class GraphNode {
   Map properties;
 
   GraphNode(int id) : id = id;
-
   String toString() {
-    var x = properties['position'].x, y = properties['position'].y;
-    return "node:$id=>($x, $y)";
+    var position = properties['position'];
+    return '$id|' + JSON.encode({'x': position.x, 'y': position.y});
   }
 }
 
@@ -119,9 +131,8 @@ class GraphEdge {
   Map properties;
 
   GraphEdge(int id) : id = id;
-
   String toString() {
     var a = start.id, b = end.id;
-    return "edge($a, $b)";
+    return 'id|$a-$b|' + JSON.encode(properties);
   }
 }

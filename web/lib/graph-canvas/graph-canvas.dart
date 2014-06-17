@@ -1,3 +1,4 @@
+library graph_canvas;
 import 'dart:html';
 import 'dart:math';
 import 'package:polymer/polymer.dart';
@@ -12,7 +13,8 @@ class GraphCanvasTag extends PolymerElement {
   GraphRenderer renderer;
   GraphModel model;
   GraphNode selected;
-  GraphNode lastCreated;
+  GraphNode lastNode;
+  GraphEdge lastEdge;
 
   GraphCanvasTag.created() : super.created();
 
@@ -36,9 +38,9 @@ class GraphCanvasTag extends PolymerElement {
   }
 
   bool createNode(Map options) {
-    lastCreated = model.createNode(options);
-    if (lastCreated != null) {
-      return model.addNode(lastCreated);
+    lastNode = model.createNode(options);
+    if (lastNode != null) {
+      return model.addNode(lastNode);
     }
     return false;
   }
@@ -47,9 +49,9 @@ class GraphCanvasTag extends PolymerElement {
     //TODO yin: Make Dijkstra's algo work for edge weight == 0
     if (start != null && end != null && weight > 0) {
       Map prop = { "weight": weight };
-      GraphEdge edge = model.createEdge(start, end, prop);
-      if (edge != null) {
-        return model.addEdge(edge);
+      lastEdge = model.createEdge(start, end, prop);
+      if (lastEdge != null) {
+        return model.addEdge(lastEdge);
       }
     }
     return false;
