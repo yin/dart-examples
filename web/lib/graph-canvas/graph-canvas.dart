@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:math';
 import 'package:polymer/polymer.dart';
+import 'graph-model.dart';
 
 var debug = true;
 
@@ -28,7 +29,7 @@ class GraphCanvasTag extends PolymerElement {
     canvas.onMouseUp.listen(mouseUp);
   }
 
-  void createNode(ootions) {
+  void createNode(options) {
 
   }
 
@@ -116,107 +117,6 @@ class GraphCanvasTag extends PolymerElement {
         throw node;
       }
     });
-  }
-}
-
-class GraphNode {
-  int id;
-  Point position;
-
-  GraphNode(int id) : id = id;
-
-  String toString() {
-    var x = position.x, y = position.y;
-    return "node:$id=>($x, $y)";
-  }
-}
-
-class GraphEdge {
-  GraphNode start;
-  GraphNode end;
-  final int id;
-
-  GraphEdge(int id) : id = id;
-
-  String toString() {
-    var a = start.id, b = end.id;
-    return "edge($a, $b)";
-  }
-}
-
-class GraphModel {
-  // graphType: #oriented, #bidirectional
-  final Symbol graphType;
-  List<GraphNode> nodes = [];
-  List<GraphEdge> edges = [];
-  static int lastNodeId = 0;
-  static int lastEdgeId = 0;
-
-  GraphModel({Symbol graphType : #bidirectional}) : graphType = graphType;
-
-  GraphNode createNodeAt(Point position) {
-    GraphNode node = new GraphNode(++lastNodeId);
-    node.position = position;
-    nodes.add(node);
-    return node;
-  }
-
-  GraphEdge createEdge(GraphNode start, GraphNode end) {
-    if (hasNode(start) && hasNode(end)) {
-      GraphEdge edge = new GraphEdge(++lastEdgeId);
-      edge.start = start;
-      edge.end = end;
-      if (!hasEdge(edge)) {
-        edges.add(edge);
-      }
-      return edge;
-    }
-    return null;
-  }
-
-  bool hasNode(GraphNode node) {
-    return true == forNodes((n) {
-      if (n == node) {
-        throw true;
-      }
-    });
-  }
-
-  bool hasEdge(GraphEdge edge, {bool opposite : false}) {
-    GraphNode start = edge.start;
-    GraphNode end = edge.end;
-    return true == forEdges((e) {
-      if ((graphType == #bidirectional || opposite == false)
-          && e.start == start && e.end == end) {
-        throw true;
-      } else if ((graphType == #bidirectional || opposite)
-          && e.start == end && e.end == start) {
-        throw true;
-      }
-    });
-  }
-
-  dynamic forNodes(void callback(GraphNode)) {
-    for (GraphNode node in nodes) {
-      try {
-        callback(node);
-      } catch(ret) {
-        return ret;
-      }
-    }
-    return null;
-  }
-
-  // TODO(yin): DRY out
-  dynamic forEdges(void callback(GraphEdge)) {
-    for (GraphEdge edge in edges) {
-      try {
-        callback(edge);
-      } catch(ret) {
-        return ret;
-      }
-    }
-    return null;
   }
 }
 
