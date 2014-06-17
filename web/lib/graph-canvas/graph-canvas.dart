@@ -2,10 +2,10 @@ import 'dart:html';
 import 'dart:math';
 import 'package:polymer/polymer.dart';
 
-var debug = true;
 
 @CustomTag('graph-canvas')
 class GraphCanvasTag extends PolymerElement {
+  static final debug = false;
   int defaultNodeDisplayRadius = 10;
   GraphNode selected;
   // #free, #selected, #dragging
@@ -298,11 +298,9 @@ class GraphRenderer {
           // maybe add here also: ... + arrowWidth / 2
           (tag.defaultNodeDisplayRadius + arrowSize);
       Point arrowEnd = end - arrowSizedDelta;
+      num angle = atan2(normalDelta.x, -normalDelta.y);
       ctx.beginPath();
-      // TODO(yin): compute angle here
-      // ... no better compute the tranform paramters, which ever they are...
-      // e.g.:    ctx.transform(matrix); ...; ctx.identity();
-      ctx.arc(arrowEnd.x, arrowEnd.y, arrowSize, 0, 2*PI);
+      ctx.arc(arrowEnd.x, arrowEnd.y, arrowSize, 0, angle);
       ctx.strokeStyle = arrowStrokeStyle;
       ctx.lineWidth = arrowWidth;
       ctx.stroke();
