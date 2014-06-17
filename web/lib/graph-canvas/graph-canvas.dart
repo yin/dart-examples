@@ -4,10 +4,9 @@ import 'dart:math';
 import 'package:polymer/polymer.dart';
 import '../graph-model.dart';
 
-var debug = false;
-
 @CustomTag('graph-canvas')
 class GraphCanvasTag extends PolymerElement {
+  static final bool debug = false;
   int defaultNodeDisplayRadius = 10;
   CanvasElement canvas;
   GraphRenderer renderer;
@@ -37,8 +36,8 @@ class GraphCanvasTag extends PolymerElement {
     }
   }
 
-  bool createNode(Map options) {
-    lastNode = model.createNode(options);
+  bool createNode(Map properties) {
+    lastNode = model.createNode(properties);
     if (lastNode != null) {
       return model.addNode(lastNode);
     }
@@ -97,6 +96,16 @@ class GraphCanvasTag extends PolymerElement {
         throw node;
       }
     });
+  }
+
+  bool parseString(String string) {
+    GraphModel model = new GraphModel.parse(string);
+    if (model != null) {
+      this.model = model;
+      selected = null;
+      return true;
+    }
+    return false;
   }
 }
 

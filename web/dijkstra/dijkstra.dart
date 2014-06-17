@@ -8,6 +8,7 @@ bool debug_hash = false;
 // #free, #selected, #dragging
 Symbol state = #free;
 GraphCanvasTag graph;
+String lastHash = '';
 
 main() {
   initPolymer();
@@ -20,16 +21,8 @@ main() {
   (querySelector('#clear') as ButtonElement).onClick.listen((e) {
     graph.renderer.clear();
   });
-  if(debug_hash) {
-    window.onHashChange.listen((e) {
-      var hash = window.location.hash;
-      print('onHashChange $hash');
-    });
-    window.onPopState.listen((e) {
-      var hash = window.location.hash;
-      print('onPopState $hash');
-    });
-  }
+  window.onPopState.listen(onHashChanged);
+  onHashChanged(null);
 }
 
 void mouseDown(Event event) {
@@ -67,7 +60,7 @@ void mouseDown(Event event) {
     print('down > $state $selected');
   }
   graph.renderer.draw();
-  window.location.hash = graph.model.toString();
+  window.location.hash = lastHash = graph.model.toString();
 }
 
 
@@ -91,5 +84,19 @@ void mouseMove(Event event) {
     Point delta = (event as MouseEvent).movement;
     graph.selected.properties['position'] = graph.selected.properties['position'] + delta;
     graph.renderer.draw();
+  }
+}
+
+void onHashChanged(PopStateEvent event) {
+  String hash = window.location.hash.toString().replaceFirst('#', '');
+  if (hash != lastHash) {
+    if (debug_hash) {
+      print("onHashChanged: newHash = $hash");
+    }
+    if (graph.parseString(hash)) {
+      state = #free;
+      graph.renderer.draw();
+    }
+    lastHash = hash;
   }
 }
