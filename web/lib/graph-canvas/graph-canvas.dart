@@ -1,84 +1,62 @@
 import 'dart:html';
 import 'dart:math';
 import 'package:polymer/polymer.dart';
-import 'graph-model.dart';
+import '../graph-model.dart';
 
-var debug = true;
+var debug = false;
 
 @CustomTag('graph-canvas')
 class GraphCanvasTag extends PolymerElement {
   int defaultNodeDisplayRadius = 10;
-  GraphNode selected;
-  // #free, #selected, #dragging
-  Symbol state = #free;
   CanvasElement canvas;
   GraphRenderer renderer;
   GraphModel model;
+  GraphNode selected;
+  GraphNode lastCreated;
 
-  GraphCanvasTag.created() : super.created() {
-    renderer = new GraphRenderer(this);
-    model = new GraphModel();
-  }
+  GraphCanvasTag.created() : super.created();
 
   void attached() {
     super.attached();
     canvas = $['graph'];
     if (debug) print(canvas);
-    canvas.onMouseMove.listen(mouseMove);
-    canvas.onMouseDown.listen(mouseDown);
-    canvas.onMouseUp.listen(mouseUp);
   }
 
-  void createNode(options) {
-
+  void initialize({renderer, model}) {
+    if (renderer != null) {
+      this.renderer = renderer;
+    } else {
+      this.renderer = new GraphRenderer(this);
+    }
+    if (model != null) {
+      this.model = model;
+    } else {
+      this.model = new GraphModel();
+    }
   }
 
-  void mouseDown(Event e) {
-    if (debug) print('down $state $selected');
-    Point position = (e as MouseEvent).offset;
-    CanvasElement canvas = e.target as CanvasElement;
-    if (state == #free) {
-      if (canvasArea(position) == #inside) {
-        GraphNode node = getNodeAt(position);
-        if (node != null) {
-          state = #dragging;
-          selected = node;
-        } else {
-          state = #dragging;
-          selected = model.createNodeAt(position);
-        }
-      } else {
-        // TODO resize canvas
-      }
-    } else if (state == #selected) {
-      GraphNode node = getNodeAt(position);
-      if (node != null) {
-        model.createEdge(selected, node);
-      } else {
-        selected = null;
-        state = #free;
+  bool createNode(Map options) {
+    lastCreated = model.createNode(options);
+    if (lastCreated != null) {
+      return model.addNode(lastCreated);
+    }
+    return false;
+  }
+
+  bool createEdge(GraphNode start, GraphNode end, {num weight : 1.0}) {
+    //TODO yin: Make Dijkstra's algo work for edge weight == 0
+    if (start != null && end != null && weight > 0) {
+      Map prop = { "weight": weight };
+      GraphEdge edge = model.createEdge(start, end, prop);
+      if (edge != null) {
+        return model.addEdge(edge);
       }
     }
-    if (debug) print('down > $state $selected');
-    renderer.draw();
+    return false;
   }
 
-  void mouseUp(Event e) {
-    if (debug) print('up $state $selected');
-    if (state == #dragging) {
-      state = #selected;
-      renderer.draw();
-    }
-    if (debug) print('up > $state $selected');
-  }
-
-  void mouseMove(Event e) {
-    if (state == #dragging && selected != null) {
-      Point delta = (e as MouseEvent).movement;
-      selected.position = new Point(selected.position.x + delta.x,
-          selected.position.y + delta.y);
-      renderer.draw();
-    }
+  void select(GraphNode node) {
+    selected = node;
   }
 
   Symbol canvasArea(Point position) {
@@ -105,7 +83,7 @@ class GraphCanvasTag extends PolymerElement {
 
   GraphNode getNodeAt(Point position) {
     return model.forNodes((node) {
-      Point delta = node.position - position;
+      Point delta = node.properties['position'] - position;
       num distSquare = delta.x*delta.x + delta.y*delta.y;
       num distance = sqrt(distSquare);
       if (debug) {
@@ -156,7 +134,7 @@ class GraphRenderer {
   }
 
   void drawNode(CanvasRenderingContext2D ctx, GraphNode node) {
-    Point pos = node.position;
+    Point pos = node.properties['position'];
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, tag.defaultNodeDisplayRadius, 0, 2*PI);
     ctx.closePath();
@@ -174,8 +152,8 @@ class GraphRenderer {
   }
 
   void drawEdge(CanvasRenderingContext2D ctx, GraphEdge edge) {
-    Point start = edge.start.position;
-    Point end = edge.end.position;
+    Point start = edge.start.properties['position'];
+    Point end = edge.end.properties['position'];
     Point delta = end - start;
     num distance = sqrt(delta.x*delta.x + delta.y*delta.y);
     Point normalDelta = new Point(delta.x / distance, delta.y / distance);
@@ -206,7 +184,7 @@ class GraphRenderer {
       ctx.strokeStyle = arrowStrokeStyle;
       ctx.lineWidth = arrowWidth;
       ctx.stroke();
-      if (tag.model.graphType == #oriented) {
+      if (tag.model.graphType == #bidirectional) {
         ctx.beginPath();
         Point arrowStart = start + arrowSizedDelta;
         ctx.arc(arrowStart.x, arrowStart.y, arrowSize, 0, 2*PI);
