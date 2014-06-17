@@ -28,6 +28,10 @@ class GraphCanvasTag extends PolymerElement {
     canvas.onMouseUp.listen(mouseUp);
   }
 
+  void createNode(ootions) {
+
+  }
+
   void mouseDown(Event e) {
     if (debug) print('down $state $selected');
     Point position = (e as MouseEvent).offset;
@@ -148,7 +152,7 @@ class GraphModel {
   static int lastNodeId = 0;
   static int lastEdgeId = 0;
 
-  GraphModel({Symbol graphType : #oriented}) : graphType = graphType;
+  GraphModel({Symbol graphType : #bidirectional}) : graphType = graphType;
 
   GraphNode createNodeAt(Point position) {
     GraphNode node = new GraphNode(++lastNodeId);
@@ -217,9 +221,21 @@ class GraphModel {
 }
 
 class GraphRenderer {
+  static final debug = false;
   GraphCanvasTag tag;
   GraphRenderer(GraphCanvasTag tag) : tag = tag;
-  num arrowSize = 2;
+  num arrowSize = 4;
+  num arrowWidth = 1;
+  num edgeWidth = 1;
+  num nodeLineWidth = 1;
+  num selectedLineWidth = 2;
+  String backgroundFill = '#ffffff';
+  String edgeStrokeStyle = '#000000';
+  String arrowStrokeStyle = '#000000';
+  String nodeFillStyle = '#d94040';
+  String nodeStrokeStyle = '#303030';
+  String selectedFillStyle = '#80d080';
+  String selectedStrokeStyle = '#303030';
 
   void draw() {
     if (debug) {
@@ -227,70 +243,83 @@ class GraphRenderer {
       print("draw() nodes:$a eges:$b");
     }
     CanvasElement canvas = tag.canvas;
-    int w = canvas.width - 1;
-    int h = canvas.height - 1;
     CanvasRenderingContext2D ctx = canvas.context2D;
     ctx.imageSmoothingEnabled = true;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
+    clear();
 
     tag.model.forNodes((node) {
       drawNode(ctx, node);
     });
-    ctx.strokeStyle = '#202020';
     tag.model.forEdges((edge) {
       drawEdge(ctx, edge);
     });
   }
 
   void drawNode(CanvasRenderingContext2D ctx, GraphNode node) {
-    ctx.beginPath();
     Point pos = node.position;
-    if (tag.selected == node) {
-      ctx.fillStyle = '#60d060';
-      ctx.strokeStyle = '#202020';
-    } else {
-      ctx.fillStyle = '#e08080';
-      ctx.strokeStyle = '#202020';
-    }
+    ctx.beginPath();
     ctx.arc(pos.x, pos.y, tag.defaultNodeDisplayRadius, 0, 2*PI);
     ctx.closePath();
+    if (tag.selected == node) {
+      ctx.fillStyle = selectedFillStyle;
+      ctx.strokeStyle = selectedStrokeStyle;
+      ctx.lineWidth = selectedLineWidth;
+    } else {
+      ctx.fillStyle = nodeFillStyle;
+      ctx.strokeStyle = nodeStrokeStyle;
+      ctx.lineWidth = nodeLineWidth;
+    }
     ctx.fill();
     ctx.stroke();
   }
 
   void drawEdge(CanvasRenderingContext2D ctx, GraphEdge edge) {
-    ctx.beginPath();
-    if (debug) print('draw.edge $edge');
     Point start = edge.start.position;
     Point end = edge.end.position;
     Point delta = end - start;
-    num distance = sqrt(delta.x^2 + delta.y^2);
-    num angle = delta.y == 0 ? 0 : atan(delta.x / delta.y);
-
-    Point normalDelta = new Point(
-        delta.x / distance * tag.defaultNodeDisplayRadius,
-        delta.y / distance * tag.defaultNodeDisplayRadius);
-    Point edgeStart = new Point(start.x+delta.x, start.y+delta.y);
-    Point edgeEnd = new Point(end.x-delta.x, start.y-delta.y);
-
-    /*
+    num distance = sqrt(delta.x*delta.x + delta.y*delta.y);
+    Point normalDelta = new Point(delta.x / distance, delta.y / distance);
+    Point nodeSizedDelta = normalDelta * tag.defaultNodeDisplayRadius;
+    Point edgeStart = start + nodeSizedDelta;
+    Point edgeEnd = end - nodeSizedDelta;
+    if (debug) {
+      print("draw.edge($edge) delta:$delta distance:$distance norm:$normalDelta");
+      print("         S:$start E:$end");
+      print("         s:$edgeStart e:$edgeEnd");
+    }
     ctx.moveTo(edgeStart.x, edgeStart.y);
     ctx.lineTo(edgeEnd.x, edgeEnd.y);
-    ctx.arc(edgeEnd.x, edgeEnd.y, arrowSize, angle - PI / 2, angle + PI / 2);
-    if (tag.model.graphType == #bidirectional) {
-      ctx.arc(edgeStart.x, edgeStart.y,
-          arrowSize, angle - PI / 2, angle + PI / 2);
-    }
-    */
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y);
+    ctx.strokeStyle = edgeStrokeStyle;
+    ctx.lineWidth = edgeWidth;
     ctx.stroke();
+
+    if (arrowSize > 0) {
+      Point arrowSizedDelta = normalDelta *
+          // maybe add here also: ... + arrowWidth / 2
+          (tag.defaultNodeDisplayRadius + arrowSize);
+      Point arrowEnd = end - arrowSizedDelta;
+      ctx.beginPath();
+      // TODO(yin): compute angle here
+      // ... no better compute the tranform paramters, which ever they are...
+      // e.g.:    ctx.transform(matrix); ...; ctx.identity();
+      ctx.arc(arrowEnd.x, arrowEnd.y, arrowSize, 0, 2*PI);
+      ctx.strokeStyle = arrowStrokeStyle;
+      ctx.lineWidth = arrowWidth;
+      ctx.stroke();
+      if (tag.model.graphType == #bidirectional) {
+        ctx.beginPath();
+        Point arrowStart = start + arrowSizedDelta;
+        ctx.arc(arrowStart.x, arrowStart.y, arrowSize, 0, 2*PI);
+        ctx.stroke();
+      }
+    }
   }
 
   void clear() {
-    ctx.fillStyle = '#ff0000';
-    ctx.fillRect(200, 200, 300, 300);
+    CanvasElement canvas = tag.canvas;
+    CanvasRenderingContext2D ctx = canvas.context2D;
+    int w = canvas.width - 1;
+    int h = canvas.height - 1;
+    ctx.clearRect(0, 0, w-1, h-1);
   }
 }
