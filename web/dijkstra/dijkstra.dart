@@ -27,27 +27,27 @@ void mouseDown(Event e) {
     print('down $state $selected');
   }
   Point position = (e as MouseEvent).offset;
-  if (state == #free) {
-    if (graph.canvasArea(position) == #inside) {
-      GraphNode node = graph.getNodeAt(position);
-      if (node != null) {
-        state = #dragging;
-        graph.select(node);
-      } else {
-        state = #dragging;
-        graph.createNode({'position': position});
-        graph.select(graph.lastCreated);
-      }
-    } else {
-      // TODO yin: show RED shadowed "denial of creation" node
-    }
-  } else if (state == #selected) {
+  Symbol area = graph.canvasArea(position);
+  if (graph.canvasArea(position) == #inside) {
     GraphNode node = graph.getNodeAt(position);
     if (node != null) {
-      graph.createEdge(graph.selected, node);
+      if (!e.ctrlKey && !e.altKey) {
+        if (node != graph.selected) {
+          state = #dragging;
+          graph.select(node);
+        } else {
+          graph.select(null);
+        }
+      } else if (e.ctrlKey || e.altKey) {
+        graph.createEdge(graph.selected, node);
+        if (e.altKey) {
+          graph.select(node);
+        }
+      }
     } else {
-      graph.select(null);
-      state = #free;
+      state = #dragging;
+      graph.createNode({'position': position});
+      graph.select(graph.lastCreated);
     }
   }
   if (debug) {
