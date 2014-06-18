@@ -90,6 +90,8 @@ class GraphModel {
         try {
           callback(element);
         } catch(ret) {
+          //TODO yin: Actual return values should be wrapped into ReturnValue()
+          //          and any errors else should be rethrown
           if(ret == #_continue) {
             continue;
           } else if (ret == #_break) {
@@ -184,7 +186,7 @@ class GraphModel {
             throw #_break;
           }
         });
-        GraphEdge edge = createEdge(start, end, properties);
+        GraphEdge edge = createEdge(start, end, properties: properties);
         int id = int.parse(fields[0]);
         if (edge != null) {
           edge.id = int.parse(fields[0]);

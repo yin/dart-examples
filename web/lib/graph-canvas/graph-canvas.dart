@@ -48,7 +48,7 @@ class GraphCanvasTag extends PolymerElement {
     //TODO yin: Make Dijkstra's algo work for edge weight == 0
     if (start != null && end != null && weight > 0) {
       Map prop = { "weight": weight };
-      lastEdge = model.createEdge(start, end, prop);
+      lastEdge = model.createEdge(start, end, properties: prop);
       if (lastEdge != null) {
         return model.addEdge(lastEdge);
       }

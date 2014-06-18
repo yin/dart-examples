@@ -2,39 +2,65 @@ library dijkstra.shortest_path;
 import 'package:collection/collection.dart';
 import 'graph-model.dart';
 
-List<GraphEdge> dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
+List<GraphNode> dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
+  Map<GraphNode, GraphNode> paths;
+  List<GraphNode> path = [];
+  bool pathFound;
+  //TODO yin: Dijkstra works for a bidirectional graph
   if (graph.graphType == #oriented) {
-    path = _dijkstra(graph, start, target);
+    paths = _dijkstra(graph, start, target);
+    if (paths.containsKey(target)) {
+      _extractPath(paths, target, (node) => path.add(node), (node) {
+        if (node == start) {
+          // This is the start node, path can be constructed
+          pathFound = true;
+        } else {
+          // This is the target node - we never reached the target
+          pathFound = false;
+        }
+      });
+    }
   } else {
     throw new ArgumentError("GraphModel type must be #oriented");
   }
+  return pathFound ? path : null;
 }
 
-void _dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
-  List<GraphNode> settled, queue;
-  Map<GraphEdge, num> distances = {};
+void _extractPath(Map<GraphNode, GraphNode> paths, GraphNode current,
+                  void addNode(GraphNode), void noPath(GraphNode)) {
+  if (paths.containsKey(current)) {
+    _extractPath(paths, paths[current], addNode, noPath);
+  } else {
+    noPath(current);
+  }
+  addNode(current);
+}
+
+Map<GraphNode, GraphNode> _dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
+  List<GraphNode> settled = [], queue = [];
+  Map<GraphNode, num> distances = {};
   Map<GraphNode, GraphEdge> pathEdges = {};
   Map<GraphNode, GraphNode> pathNodes = {};
   queue.add(start);
   distances[start] = 0.0;
-  _relaxNeighbours(graph, start, queue, settled, distances, pathEdges,
-      pathNodes);
   while(!queue.isEmpty) {
-    GraphEdge minEdge = _extractMinimum(graph, queue, distances);
-    settled.add(minEdge.start);
-    _relaxNeighbours(graph, minEdge.end, queue, settled, distances, pathEdges,
+    GraphNode minimumNode = _extractMinimum(graph, queue, distances);
+    settled.add(minimumNode);
+    if (minimumNode == target) {
+      break;
+    }
+    _relaxNeighbours(graph, minimumNode, queue, settled, distances, pathEdges,
         pathNodes);
   }
+  return pathNodes;
 }
 
-GraphEdge _extractMinimum(GraphModel graph, List<GraphNode> queue,
+GraphNode _extractMinimum(GraphModel graph, List<GraphNode> queue,
                           Map<GraphNode, num> distances) {
-  GraphEdge u = queue.first;
-  num weight = _weight(u);
-  for (GraphEdge edge in queue) {
-    if (distances[u.end] > distances[edge.end] + weight) {
-      GraphEdge u = edge;
-      num weight = _weight(u);
+  GraphNode u = queue.first;
+  for (GraphNode node in queue) {
+    if (distances[u] > distances[node]) {
+      u = node;
     }
   }
   queue.remove(u);
@@ -51,7 +77,7 @@ void _relaxNeighbours(GraphModel graph, GraphNode u, List<GraphNode> queue,
       GraphNode v = bidirect ? edge.start : edge.end;
       num weight = _weight(edge);
       if (!settled.contains(v)) {
-        if (!!distances.containsKey(v) || distances[v] > distances.u + weight) {
+        if (!distances.containsKey(v) || distances[v] > distances[u] + weight) {
           distances[v] = distances[u] + weight;
           pathEdges[v] = edge;
           pathNodes[v] = u;
