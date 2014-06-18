@@ -38,12 +38,12 @@ class GraphModel {
     });
   }
 
-  GraphEdge createEdge(GraphNode start, GraphNode end, Map properties) {
+  GraphEdge createEdge(GraphNode start, GraphNode end, {Map properties : null }) {
     if (start != null && end != null && hasNode(start) && hasNode(end)) {
       GraphEdge edge = new GraphEdge(++lastEdgeId);
       edge.start = start;
       edge.end = end;
-      edge.properties = properties;
+      edge.properties = properties != null ? properties : {};
       return edge;
     }
     return null;
