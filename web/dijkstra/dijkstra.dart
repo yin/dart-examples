@@ -2,10 +2,11 @@ import 'package:polymer/polymer.dart';
 import 'dart:html';
 import '../lib/graph-canvas/graph-canvas.dart';
 import '../lib/graph-model.dart';
+import '../lib/dijkstra-shortest-path.dart';
 
 bool debug = false;
 bool debug_hash = false;
-// #free, #selected, #dragging
+// #free, #selected, #dragging; #path_start, #path_end
 Symbol state = #free;
 GraphCanvasTag graph;
 String lastHash = '';
@@ -18,8 +19,20 @@ main() {
   graph.onMouseDown.listen(mouseDown);
   graph.onMouseUp.listen(mouseUp);
 
-  (querySelector('#clear') as ButtonElement).onClick.listen((e) {
-    graph.renderer.clear();
+  (querySelector('#new-directed') as ButtonElement).onClick.listen((e) {
+    graph.model = new GraphModel(graphType: #oriented);
+  });
+  (querySelector('#new-undirected') as ButtonElement).onClick.listen((e) {
+    graph.model = new GraphModel(graphType: #bidirectional);
+  });
+  (querySelector('#find-path') as ButtonElement).onClick.listen((e) {
+    state = #path_start;
+    graph.select(null);
+    graph.renderer.draw();
+  });
+  (querySelector('#reset-path') as ButtonElement).onClick.listen((e) {
+    graph.path = null;
+    graph.renderer.draw();
   });
   window.onPopState.listen(onHashChanged);
   onHashChanged(null);
@@ -38,8 +51,7 @@ void mouseDown(Event event) {
     if (node != null) {
       if (!mouseEvent.ctrlKey && !mouseEvent.altKey) {
         if (node != graph.selected) {
-          state = #dragging;
-          graph.select(node);
+          select(node);
         } else {
           graph.select(null);
         }
@@ -50,9 +62,11 @@ void mouseDown(Event event) {
         }
       }
     } else {
-      state = #dragging;
-      graph.createNode({'position': position});
-      graph.select(graph.lastNode);
+      if (state != #path_start && state != #path.end) {
+        state = #dragging;
+        graph.createNode({'position': position});
+        graph.select(graph.lastNode);
+      }
     }
   }
   if (debug) {
@@ -61,6 +75,22 @@ void mouseDown(Event event) {
   }
   graph.renderer.draw();
   window.location.hash = lastHash = graph.model.toString();
+}
+
+void select(GraphNode node) {
+  if (state == #free || state == #selected) {
+    state = #dragging;
+    graph.select(node);
+  } else if (state == #path_start) {
+    state = #path_end;
+    graph.select(node);
+  } else if (state == #path_end) {
+    state = #free;
+    GraphNode start = graph.selected;
+    graph.select(node);
+    List<GraphNode> path = dijkstra(graph.model, start, node);
+    graph.path = path;
+  }
 }
 
 

@@ -10,12 +10,20 @@ class GraphCanvasTag extends PolymerElement {
   int defaultNodeDisplayRadius = 10;
   CanvasElement canvas;
   GraphRenderer renderer;
-  GraphModel model;
+  GraphModel _model;
   GraphNode selected;
+  List<dynamic> path;
   GraphNode lastNode;
   GraphEdge lastEdge;
 
   GraphCanvasTag.created() : super.created();
+
+  GraphModel get model => _model;
+  set model(GraphModel model) {
+    _model = model;
+    selected = null;
+    renderer.draw();
+  }
 
   void attached() {
     super.attached();
@@ -116,8 +124,10 @@ class GraphRenderer {
   num arrowSize = 4;
   num arrowWidth = 1;
   num edgeWidth = 1;
-  num nodeLineWidth = 1;
+  num nodeWidth = 1;
   num selectedLineWidth = 2;
+  num pathNodeWidth = 3;
+  num pathEdgeWidth = 2;
   String backgroundFill = '#ffffff';
   String edgeStrokeStyle = '#000000';
   String arrowStrokeStyle = '#000000';
@@ -156,7 +166,11 @@ class GraphRenderer {
     } else {
       ctx.fillStyle = nodeFillStyle;
       ctx.strokeStyle = nodeStrokeStyle;
-      ctx.lineWidth = nodeLineWidth;
+      if (tag.path != null && !tag.path.contains(node)) {
+        ctx.lineWidth = nodeWidth;
+      } else {
+        ctx.lineWidth = pathNodeWidth;
+      }
     }
     ctx.fill();
     ctx.stroke();
@@ -179,7 +193,11 @@ class GraphRenderer {
     ctx.moveTo(edgeStart.x, edgeStart.y);
     ctx.lineTo(edgeEnd.x, edgeEnd.y);
     ctx.strokeStyle = edgeStrokeStyle;
-    ctx.lineWidth = edgeWidth;
+    if (tag.path != null && !tag.path.contains(edge)) {
+      ctx.lineWidth = edgeWidth;
+    } else {
+      ctx.lineWidth = pathEdgeWidth;
+    }
     ctx.stroke();
 
     if (arrowSize > 0) {
