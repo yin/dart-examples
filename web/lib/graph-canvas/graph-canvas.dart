@@ -121,20 +121,31 @@ class GraphRenderer {
   static final debug = false;
   GraphCanvasTag tag;
   GraphRenderer(GraphCanvasTag tag) : tag = tag;
-  num arrowSize = 4;
-  num arrowWidth = 1;
-  num edgeWidth = 1;
-  num nodeWidth = 1;
-  num selectedLineWidth = 2;
-  num pathNodeWidth = 3;
-  num pathEdgeWidth = 2;
   String backgroundFill = '#ffffff';
-  String edgeStrokeStyle = '#000000';
-  String arrowStrokeStyle = '#000000';
-  String nodeFillStyle = '#d94040';
-  String nodeStrokeStyle = '#303030';
-  String selectedFillStyle = '#80d080';
-  String selectedStrokeStyle = '#303030';
+  String edgeStroke_none = '#000000';
+  String edgeStroke_selected = '#606060';
+  String edgeStroke_path = '#000000';
+  num edgeWidth_none = 1;
+  num edgeWidth_selected = 2;
+  num edgeWidth_path = 2;
+  String arrowStroke_none = '#000000';
+  String arrowStroke_selected = '#000000';
+  String arrowStroke_path = '#000000';
+  num arrowSize_none = 16;
+  num arrowSize_selected = 16;
+  num arrowSize_path = 16;
+  num arrowWidthIncrement_none = 0;
+  num arrowWidthIncrement_selected = 1;
+  num arrowWidthIncrement_path = 1;
+  String nodeStroke_none = '#303030';
+  String nodeStroke_selected = '#303030';
+  String nodeStroke_path = '#303030';
+  String nodeFill_none = '#d94040';
+  String nodeFill_selected = '#80d080';
+  String nodeFill_path = '#d94040';
+  num nodeWidth_none = 1;
+  num nodeWidth_selected = 2;
+  num nodeWidth_path = 3;
 
   void draw() {
     if (debug) {
@@ -159,19 +170,7 @@ class GraphRenderer {
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, tag.defaultNodeDisplayRadius, 0, 2*PI);
     ctx.closePath();
-    if (tag.selected == node) {
-      ctx.fillStyle = selectedFillStyle;
-      ctx.strokeStyle = selectedStrokeStyle;
-      ctx.lineWidth = selectedLineWidth;
-    } else {
-      ctx.fillStyle = nodeFillStyle;
-      ctx.strokeStyle = nodeStrokeStyle;
-      if (tag.path != null && !tag.path.contains(node)) {
-        ctx.lineWidth = nodeWidth;
-      } else {
-        ctx.lineWidth = pathNodeWidth;
-      }
-    }
+    applyStyle(ctx, node);
     ctx.fill();
     ctx.stroke();
   }
@@ -180,44 +179,96 @@ class GraphRenderer {
     Point start = edge.start.properties['position'];
     Point end = edge.end.properties['position'];
     Point delta = end - start;
+    //TODO yin: Test sqrt(Pitagoras) vs. Point.distanceTo() approach fo speed
     num distance = sqrt(delta.x*delta.x + delta.y*delta.y);
-    Point normalDelta = new Point(delta.x / distance, delta.y / distance);
-    Point nodeSizedDelta = normalDelta * tag.defaultNodeDisplayRadius;
+    Point tangent = new Point(delta.x / distance, delta.y / distance);
+    Point nodeSizedDelta = tangent * tag.defaultNodeDisplayRadius;
     Point edgeStart = start + nodeSizedDelta;
     Point edgeEnd = end - nodeSizedDelta;
+    ctx.beginPath();
+    ctx.moveTo(edgeStart.x, edgeStart.y);
+    ctx.lineTo(edgeEnd.x, edgeEnd.y);
+    applyStyle(ctx, edge);
+    ctx.stroke();
+    drawArrow(ctx, edge, tangent, edgeStart, edgeEnd);
     if (debug) {
-      print("draw.edge($edge) delta:$delta distance:$distance norm:$normalDelta");
+      print("draw.edge($edge) delta:$delta distance:$distance norm:$tangent");
       print("         S:$start E:$end");
       print("         s:$edgeStart e:$edgeEnd");
     }
-    ctx.moveTo(edgeStart.x, edgeStart.y);
-    ctx.lineTo(edgeEnd.x, edgeEnd.y);
-    ctx.strokeStyle = edgeStrokeStyle;
-    if (tag.path != null && !tag.path.contains(edge)) {
-      ctx.lineWidth = edgeWidth;
-    } else {
-      ctx.lineWidth = pathEdgeWidth;
-    }
-    ctx.stroke();
+  }
 
-    if (arrowSize > 0) {
-      Point arrowSizedDelta = normalDelta *
-          // maybe add here also: ... + arrowWidth / 2
-          (tag.defaultNodeDisplayRadius + arrowSize);
-      Point arrowEnd = end - arrowSizedDelta;
+  void drawArrow(CanvasRenderingContext2D ctx, GraphEdge edge, Point tangent,
+                 Point edgeStart, Point edgeEnd) {
+    if (arrowSize_none > 0 || arrowSize_selected > 0|| arrowSize_path > 0) {
+      //TODO yin: account for arrowWidth
+      Point arrowBase = tangent * arrowSize_none;
+      num angle = 20/180*PI;
       ctx.beginPath();
       // TODO(yin): compute angle here
       // ... no better compute the tranform paramters, which ever they are...
       // e.g.:    ctx.transform(matrix); ...; ctx.identity();
-      ctx.arc(arrowEnd.x, arrowEnd.y, arrowSize, 0, 2*PI);
-      ctx.strokeStyle = arrowStrokeStyle;
-      ctx.lineWidth = arrowWidth;
+      _drawRotatedLine(ctx, edgeEnd, arrowBase, angle);
+      _drawRotatedLine(ctx, edgeEnd, arrowBase, -angle);
+      applyStyle(ctx, edge, subStyle: #arrow);
       ctx.stroke();
       if (tag.model.graphType == #bidirectional) {
         ctx.beginPath();
-        Point arrowStart = start + arrowSizedDelta;
-        ctx.arc(arrowStart.x, arrowStart.y, arrowSize, 0, 2*PI);
+        arrowBase = tangent * -arrowSize_none;
+        _drawRotatedLine(ctx, edgeStart, arrowBase, angle);
+        _drawRotatedLine(ctx, edgeStart, arrowBase, -angle);
         ctx.stroke();
+      }
+    }
+  }
+
+  void _drawRotatedLine(CanvasRenderingContext2D ctx, Point center, Point base,
+                        num angle) {
+    Point rotated  = new Point(base.x*cos(angle) - base.y*sin(angle),
+        base.x*sin(angle) + base.y*cos(angle));
+    Point end = center - rotated;
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(end.x, end.y);
+  }
+
+  void applyStyle(CanvasRenderingContext2D ctx, dynamic object, {subStyle : null}) {
+    if (object is GraphEdge) {
+      if (subStyle == #arrow) {
+        if (tag.selected == object) {
+          ctx.strokeStyle = arrowStroke_selected;
+          ctx.lineWidth = edgeWidth_none + arrowWidthIncrement_selected;
+        } else if (tag.path != null && tag.path.contains(object)) {
+          ctx.strokeStyle = arrowStroke_path;
+          ctx.lineWidth = edgeWidth_path + arrowWidthIncrement_path;
+        } else {
+          ctx.strokeStyle = arrowStroke_none;
+          ctx.lineWidth = edgeWidth_none + arrowWidthIncrement_none;
+        }
+      } else {
+        if (tag.selected == object) {
+          ctx.strokeStyle = edgeStroke_selected;
+          ctx.lineWidth = edgeWidth_selected;
+        } else if (tag.path != null && tag.path.contains(object)) {
+          ctx.strokeStyle = edgeStroke_path;
+          ctx.lineWidth = edgeWidth_path;
+        } else {
+          ctx.strokeStyle = edgeStroke_none;
+          ctx.lineWidth = edgeWidth_none;
+        }
+      }
+    } else if (object is GraphNode) {
+      if (tag.selected == object) {
+        ctx.fillStyle = nodeFill_selected;
+        ctx.strokeStyle = nodeStroke_selected;
+        ctx.lineWidth = nodeWidth_selected;
+      } else if (tag.path != null && tag.path.contains(object)) {
+        ctx.fillStyle = nodeFill_path;
+        ctx.strokeStyle = nodeStroke_path;
+        ctx.lineWidth = nodeWidth_path;
+      } else {
+        ctx.fillStyle = nodeFill_none;
+        ctx.strokeStyle = nodeStroke_none;
+        ctx.lineWidth = nodeWidth_none;
       }
     }
   }
@@ -225,8 +276,8 @@ class GraphRenderer {
   void clear() {
     CanvasElement canvas = tag.canvas;
     CanvasRenderingContext2D ctx = canvas.context2D;
-    int w = canvas.width - 1;
-    int h = canvas.height - 1;
-    ctx.clearRect(0, 0, w-1, h-1);
+    int w = canvas.width;
+    int h = canvas.height;
+    ctx.clearRect(0, 1, w-1, h-1);
   }
 }
