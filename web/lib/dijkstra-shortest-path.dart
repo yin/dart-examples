@@ -1,28 +1,20 @@
 library dijkstra.shortest_path;
-import 'package:collection/collection.dart';
 import 'graph-model.dart';
 
 List<GraphNode> dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
   Map<GraphNode, GraphNode> paths;
   List<GraphNode> path = [];
   bool pathFound;
-  //TODO yin: Dijkstra works for a bidirectional graph
-  if (graph.graphType == #oriented) {
-    paths = _dijkstra(graph, start, target);
-    if (paths.containsKey(target)) {
-      _extractPath(paths, target, (node) => path.add(node), (node) {
-        if (node == start) {
-          // This is the start node, path can be constructed
-          pathFound = true;
-        } else {
-          // This is the target node - we never reached the target
-          pathFound = false;
-        }
-      });
+  paths = _dijkstra(graph, start, target);
+  _extractPath(paths, target, (node) => path.add(node), (node) {
+    if (node == start) {
+      // This is the start node, path can be constructed
+      pathFound = true;
+    } else {
+      // This is the target node - we never reached the target
+      pathFound = false;
     }
-  } else {
-    throw new ArgumentError("GraphModel type must be #oriented");
-  }
+  });
   return pathFound ? path : null;
 }
 
@@ -72,7 +64,7 @@ void _relaxNeighbours(GraphModel graph, GraphNode u, List<GraphNode> queue,
                       Map<GraphNode, GraphEdge> pathEdges,
                       Map<GraphNode, GraphNode> pathNodes) {
   graph.forEdges((edge) {
-    bool bidirect = graph.graphType == #bidirectional && egde.end == u;
+    bool bidirect = graph.graphType == #bidirectional && edge.end == u;
     if (edge.start == u || bidirect) {
       GraphNode v = bidirect ? edge.start : edge.end;
       num weight = _weight(edge);
