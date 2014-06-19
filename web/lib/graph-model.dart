@@ -1,6 +1,7 @@
 library graph_model;
 import 'dart:math' show Point;
 import 'dart:convert' show JSON;
+import 'util.dart' show For;
 
 class GraphModel {
   static final bool debug_parse = false;
@@ -72,35 +73,11 @@ class GraphModel {
   }
 
   dynamic forNodes(void callback(GraphNode)) {
-    return _for(callback, nodes);
+    return For.each(nodes, callback);
   }
 
   dynamic forEdges(void callback(GraphEdge)) {
-    return _for(callback, edges);
-  }
-
-  /**
-   * Iterates over an Interable/List and calls callback for each element.
-   * If callback throws a value, it is returned from _for().
-   * Throw #_continue to invoke keyword continue in the loop.
-   * Throw #_break to invoke break.
-   */
-  dynamic _for(void callback(dynamic), Iterable iterable) {
-    for (var element in iterable) {
-        try {
-          callback(element);
-        } catch(ret) {
-          //TODO yin: Actual return values should be wrapped into ReturnValue()
-          //          and any errors else should be rethrown
-          if(ret == #_continue) {
-            continue;
-          } else if (ret == #_break) {
-            break;
-          }
-          return ret;
-        }
-      }
-    return null;
+    return For.each(edges, callback);
   }
 
   String toString() => type + ';' +
@@ -183,7 +160,7 @@ class GraphModel {
             end = node;
           }
           if (start != null && end != null) {
-            throw #_break;
+            new For.Break().Do;
           }
         });
         GraphEdge edge = createEdge(start, end, properties: properties);
