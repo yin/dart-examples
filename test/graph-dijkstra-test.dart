@@ -39,7 +39,10 @@ main() {
     List<GraphNode> path = dijkstra(graph, graph.nodes[0], graph.nodes[3]);
     expect(nodes.length, equals(6));
     expect(edges.length, equals(10));
-    expect(path, orderedEquals([nodes[0], nodes[1], nodes[2], nodes[3]]));
+    expect(path, orderedEquals([nodes[0], edges[0],
+                                nodes[1], edges[5],
+                                nodes[2], edges[6],
+                                nodes[3]]));
   });
   test("dijkstra() should find shortest path in graph radial(N=6, M=10) to be: 1-4", () {
     GraphModel graph = new GraphModel.parse(graph_radial_6_10_p14);
@@ -48,7 +51,8 @@ main() {
     List<GraphNode> path = dijkstra(graph, graph.nodes[0], graph.nodes[3]);
     expect(nodes.length, equals(6));
     expect(edges.length, equals(10));
-    expect(path, orderedEquals([nodes[0], nodes[3]]));
+    expect(path, orderedEquals([nodes[0], edges[2],
+                                nodes[3]]));
   });
   test("dijkstra() should find shortest path in graph square(N=6, M=10) to be: 1-4", () {
     GraphModel graph = new GraphModel.parse(graph_square_9_12_p1254789);
@@ -57,8 +61,13 @@ main() {
     List<GraphNode> path = dijkstra(graph, graph.nodes[0], graph.nodes[8]);
     expect(nodes.length, equals(9));
     expect(edges.length, equals(12));
-    expect(path, orderedEquals([nodes[0], nodes[1], nodes[4], nodes[3],
-                                nodes[6], nodes[7], nodes[8]]));
+    expect(path, orderedEquals([nodes[0], edges[0],
+                                nodes[1], edges[8],
+                                nodes[4], edges[2],
+                                nodes[3], edges[7],
+                                nodes[6], edges[4],
+                                nodes[7], edges[5],
+                                nodes[8]]));
   });
   test("dijkstra() should find shortest path in graph square(N=6, M=10) to be: 1-4", () {
     GraphModel graph = new GraphModel.parse(graph_square_9_12_p12589);
@@ -67,7 +76,10 @@ main() {
     List<GraphNode> path = dijkstra(graph, graph.nodes[0], graph.nodes[8]);
     expect(nodes.length, equals(9));
     expect(edges.length, equals(12));
-    expect(path, orderedEquals([nodes[0], nodes[1], nodes[4], nodes[7],
+    expect(path, orderedEquals([nodes[0], edges[0],
+                                nodes[1], edges[8],
+                                nodes[4], edges[9],
+                                nodes[7], edges[5],
                                 nodes[8]]));
   });
   test("dijkstra() should find no path in graph quare(N=4, M=4)", () {

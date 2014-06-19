@@ -2,33 +2,43 @@ library dijkstra.shortest_path;
 import 'graph-model.dart';
 
 List<GraphNode> dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
-  Map<GraphNode, GraphNode> paths;
-  List<GraphNode> path = [];
+  List<List<dynamic>> paths;
+  List<dynamic> path = [];
   bool pathFound;
   paths = _dijkstra(graph, start, target);
-  _extractPath(paths, target, (node) => path.add(node), (node) {
-    if (node == start) {
-      // This is the start node, path can be constructed
-      pathFound = true;
-    } else {
-      // This is the target node - we never reached the target
-      pathFound = false;
-    }
-  });
+
+  _extractPath(target,
+      paths[0] as Map<GraphNode, GraphNode>,
+      paths[1] as Map<GraphNode, GraphEdge>,
+      addNode: (node) => path.add(node),
+      addEdge: (edge) => path.add(edge),
+      // If we reached start node, path can be constructed.
+      // If don't, there's no path between start and target.
+      endPath: (node) => pathFound = node == start
+  );
   return pathFound ? path : null;
 }
 
-void _extractPath(Map<GraphNode, GraphNode> paths, GraphNode current,
-                  void addNode(GraphNode), void noPath(GraphNode)) {
-  if (paths.containsKey(current)) {
-    _extractPath(paths, paths[current], addNode, noPath);
+void _extractPath(GraphNode current, Map<GraphNode, GraphNode> pathNodes,
+                  Map<GraphNode, GraphEdge> pathEdges,
+                  {void addNode(GraphNode) : null, void addEdge(GraphNode) : null,
+                    void endPath(GraphNode) : null}) {
+  GraphEdge edge = null;
+  if (pathNodes.containsKey(current)) {
+    if (pathEdges.containsKey(current) && addEdge != null) {
+      edge = pathEdges[current];
+    }
+    _extractPath(pathNodes[current], pathNodes, pathEdges, addNode: addNode,
+        addEdge: addEdge, endPath: endPath);
   } else {
-    noPath(current);
+    endPath(current);
   }
+  if (edge != null && addEdge != null) addEdge(edge);
+  if (addNode != null)
   addNode(current);
 }
 
-Map<GraphNode, GraphNode> _dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
+List<List<dynamic>> _dijkstra(GraphModel graph, GraphNode start, GraphNode target) {
   List<GraphNode> settled = [], queue = [];
   Map<GraphNode, num> distances = {};
   Map<GraphNode, GraphEdge> pathEdges = {};
@@ -44,7 +54,7 @@ Map<GraphNode, GraphNode> _dijkstra(GraphModel graph, GraphNode start, GraphNode
     _relaxNeighbours(graph, minimumNode, queue, settled, distances, pathEdges,
         pathNodes);
   }
-  return pathNodes;
+  return [pathNodes, pathEdges];
 }
 
 GraphNode _extractMinimum(GraphModel graph, List<GraphNode> queue,
