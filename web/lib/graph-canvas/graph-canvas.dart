@@ -16,7 +16,10 @@ class GraphCanvasTag extends PolymerElement {
   GraphNode lastNode;
   GraphEdge lastEdge;
 
-  GraphCanvasTag.created() : super.created();
+  GraphCanvasTag.created() : super.created() {
+    if (debug)
+      print("GraphCanvasTag.created()");
+  }
 
   GraphModel get model => _model;
   set model(GraphModel model) {
@@ -25,10 +28,12 @@ class GraphCanvasTag extends PolymerElement {
     renderer.draw();
   }
 
+  @override
   void attached() {
     super.attached();
     canvas = $['graph'];
-    if (debug) print(canvas);
+    if (debug)
+      print("GraphCanvasTag.attached()");
   }
 
   void initialize({renderer, model}) {

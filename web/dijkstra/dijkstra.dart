@@ -12,30 +12,40 @@ GraphCanvasTag graph;
 String lastHash = '';
 
 main() {
-  initPolymer();
-  graph = querySelector('#graph') as GraphCanvasTag;
-  graph.initialize();
-  graph.onMouseMove.listen(mouseMove);
-  graph.onMouseDown.listen(mouseDown);
-  graph.onMouseUp.listen(mouseUp);
+  initPolymer().run(() {
+    Polymer.onReady.then(start);
+  });
+}
 
-  (querySelector('#new-directed') as ButtonElement).onClick.listen((e) {
-    graph.model = new GraphModel(graphType: #oriented);
-  });
-  (querySelector('#new-undirected') as ButtonElement).onClick.listen((e) {
-    graph.model = new GraphModel(graphType: #bidirectional);
-  });
-  (querySelector('#find-path') as ButtonElement).onClick.listen((e) {
-    state = #path_start;
-    graph.select(null);
-    graph.renderer.draw();
-  });
-  (querySelector('#reset-path') as ButtonElement).onClick.listen((e) {
-    graph.path = null;
-    graph.renderer.draw();
-  });
-  window.onPopState.listen(onHashChanged);
-  onHashChanged(null);
+void start(event) {
+  try {
+    HtmlElement e = querySelector('#graph');
+    graph = e as GraphCanvasTag;
+    graph.initialize();
+    graph.onMouseMove.listen(mouseMove);
+    graph.onMouseDown.listen(mouseDown);
+    graph.onMouseUp.listen(mouseUp);
+
+    (querySelector('#new-directed') as ButtonElement).onClick.listen((e) {
+      graph.model = new GraphModel(graphType: #oriented);
+    });
+    (querySelector('#new-undirected') as ButtonElement).onClick.listen((e) {
+      graph.model = new GraphModel(graphType: #bidirectional);
+    });
+    (querySelector('#find-path') as ButtonElement).onClick.listen((e) {
+      state = #path_start;
+      graph.select(null);
+      graph.renderer.draw();
+    });
+    (querySelector('#reset-path') as ButtonElement).onClick.listen((e) {
+      graph.path = null;
+      graph.renderer.draw();
+    });
+    window.onPopState.listen(onHashChanged);
+    onHashChanged(null);
+  } catch(e) {
+    print (e);
+  }
 }
 
 void mouseDown(Event event) {
