@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "dart-examples.dart.js",
+  "sourceRoot": "",
+  "sources": ["dart-examples.dart","packages/$sdk/lib/_internal/lib/internal_patch.dart","packages/$sdk/lib/_internal/lib/js_primitives.dart"],
+  "names": ["printString"],
+  "mappings": "A;A;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;C;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;gC;;QAAA;ICcEA;GDZF;;;uD;;eEkBA;;;AAII;;;;AAOA;;;AAKA;;;AAMA;;;GAOJ;;;A;A;;A;A;A;A;A;A;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;A"
+}

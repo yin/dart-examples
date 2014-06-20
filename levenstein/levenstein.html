@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../dart-examples.css">
+    <title>Dart examples - Levenstein distance</title>
+  </head>
+  <body>
+    <h1>Levenstein distance</h1>
+
+    <p style="font-size: 0.7em">
+    <a href="../dart-examples.html">&lt;&lt; Back home</a>
+    </p>
+
+    <p>Levenstein distance is the number of changes you have needed to change
+    one string into another. Levenstein is a special case of edit distance,
+    where replacement of character (removal and addition) is counted as one.
+    </p>
+
+    <div id="sample_container_id">
+      <input type="text" id="string1">
+      <input type="text" id="string2">
+      <button id="run">Compute edit distance</button>
+      <p>Result: <span id="result"></span></p>
+    </div>
+
+    <script type="application/dart" src="levenstein.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
