@@ -1,5 +1,5 @@
-name: dart_toy
-description: A sample web application
+name: dart_examples
+description: Web application showing example code in Dart language.
 dependencies:
   browser: any
   polymer: ">=0.10.0 <0.11.0"
