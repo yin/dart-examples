@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dart examples - Yin's Github repository</title>
+    <link rel="stylesheet" href="dart-examples.css">
+  </head>
+  <body>
+    <h1>Dart examples</h1>
+
+    <p>This site is an example of different features of the Dart language. I
+    put it together as an excercise while learning Dart. Dart is not only a
+    languge, it's a platform and developement tool-chain. Partially the next
+    evolutionary stage of Google Web Toolkit (GWT), Dart is also meant an
+    ambitious replacement for JavaScript, the standing Web programming
+    langauge.</p>
+    <p>All pages including the home include all kind of features and effects
+    implemented in Dart. To name few: Hiding sections enhancing usability,
+    animations dramatizing algorithm inner working and simple toys and easter
+    eggs. The point of this site is to explore dart and all it's features.
+    Additionally, the code is meant to be read much as examples are. The code
+    should is written in a particular style, noticable hrough the axamples.</p>
+
+    <ul>
+      <li><a href="levenstein/levenstein.html">Levenstein distance</a> calculator</li>
+      <li><a href="dijkstra/dijkstra.html">Dijkstra's shortest path</a> algoritm</li>
+    </ul>
+
+    <h2>TODOs:</h2>
+    <ul>
+      <li>Bar display Polymer demo</li>
+    </ul>
+
+    <h2>Notes:</h2>
+    <dl>
+      <dt>Dart syntax</dt>
+      <dd>
+        <dl>
+          <dt><code>#symbols</code></dt>
+          <dd>Symbol class is similar to symbols in Ruby. The syntax allows for
+          ad-hoc enumaration, which does not suffer from non-extendibility like
+          Java's enums
+
+          <dt><code>function(can, have, {optional, arguments : withDefaulValue}
+          </code></dt>
+          <dd>Enclose optional function arguments into brackets, default value
+          may follow after a colon.</dd>
+
+          <dt><code>static Named.constructors()</code></dt>
+          <dd>Static functions are also named constructors. Calls to them are
+          prepended with <code>new</code> keyword. The resulting value is a new
+          object as if using a constructor</dd>
+
+          <dt><code>Constructior(a, b) : initializers = a, list = b { /*...*/ }
+          </code></dt>
+          <dd>Final fields have to be initialized before constructor body
+          executes. This is achieved using constructor initialize, which are put
+          after semicolon just before constructor body.</dd>
+
+          <dt><code>@Annotations</code><dt>
+          <dd>Dart has annotations with syntax similar to Java annotations.</dd>
+        </dl>
+      </dd>
+
+      <dt>Dart API</dt>
+      <dd>
+        <dl>
+          <dt>Dart has no arrays</dt>
+          <dd>There is Iterable class, Collection extends it. Set, List and Queue</dd>
+
+          <dt><code>List&lt;T&gt;</code> methods throws <code>RangeError</code>
+          </dt>
+          <dd>Use add() method to add elements. A list can be indexed only for
+          reading or setting items, not to add new items.</dd>
+        </dl>
+
+      <dt>Unit testing framework</dt>
+      <dd>
+        <dl>
+          <dd>For writing unit tests, there is the unittest package, which can be
+          put into dev_dependencies in pubspec.yaml file. Tests are defined using
+          the test() method taking test name and test function as parameter. The
+          test() methods are called from main() function and for browser apps the
+          test script is included into a blank html page, which will be filled with
+          test results.</dd>
+
+          <dt>Expectation matchers</dt>
+          <dd>Expectations in tests are modelled similarly to hamcrest matchers in
+          Java. There's plenty of expectation matchers.</dd>
+          <dt>Test PASS, FAIL and ERROR</dt>
+          <dd>A test can PASS, or FAIL the expectations. Alternativelly, if an
+          exception is thrown during test execution, the test can result in ERROR.</dd>
+        </dl>
+      </dd>
+
+      <dt>Dart libraries</dt>
+      <dd>
+        <dl>
+          <dt>Polymer - reusable HTML components</dt>
+          <dd>Polymer is a dart library, which allows to create custom HTML
+          tags, with login and markup isolated fromthe rest of application.
+          Polymer needs to be imported into HTML page and initialized. The HTML
+          page then can import and reference custom tags. A custom tag has
+          <code>&lt;template&lt;</code> and <code>&lt;script&lt;</code>.</dd>
+
+          <dt>Polymer - <code>&lt;template&gt;</code> tag</dt>
+          <dd>Template tag in a polymner component HTML can include a style tag
+          and arbitrary HTML tags, whch create the component visual appearence.
+            <dl>
+              <dt>Polymer - template <code>{{expression}}</code></dt>
+              <dd>Template tag in a polymner component HTML can include a <code>
+              &lt;style&lt;</code> tag
+              and arbitrary HTML tags, whch create the component visual
+              appearence.</dd>
+              <dt>Polymer - declarative <code>on-<i>event</i>=""</code>
+              handlers</dt>
+              <dd><code>&lt;template&gt;</code> tag in a polymner component HTML
+              can include a style tag and arbitrary HTML tags, whch create the
+              component visual appearence.</dd>
+            </dl>
+          </dd>
+
+          <dt>Polymer - script</dt>
+          <dd>The script defines a class annotated with <code>@CustomTag</code>.
+          The annotation takes element name as option. The class may extend
+          PolymentElement class, override it's methods and provide new methods
+          and behaviour to the component.
+          <dl>
+            <dt><code>$['<i>selector</i>']</code> instead of <code>
+            querySelector()</code></dt>
+            <dd>Use <code>$['<i>selector</i>']</code> to access component DOM
+            </dd>
+          </dl>
+          </dd>
+        </dl>
+      </dd>
+    </dl>
+
+    <script type="application/dart" src="index.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
