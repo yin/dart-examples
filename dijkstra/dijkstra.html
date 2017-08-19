@@ -1,0 +1,130 @@
+<!DOCTYPE html><html><head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <title>Dart examples - Dijkstra's shortest-path</title>
+  </head>
+
+  <body><style>
+body {
+  background-color: #F8F8F8;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.2em;
+  margin: 15px;
+}
+
+h1, p {
+  color: #333;
+}
+
+h2 {
+  color: #666;
+}
+
+dt {
+  font-weight: bold;
+}
+dd {
+  margin-bottom: 0.5em;
+  margin-left: 2em;
+}
+</style>
+
+<!--
+These two files are from the Polymer project:
+https://github.com/Polymer/platform/ and https://github.com/Polymer/polymer/.
+
+You can replace platform.js and polymer.html with different versions if desired.
+-->
+<!-- minified for deployment: -->
+
+
+
+<!-- unminfied for debugging:
+<script src="../../packages/web_components/platform.concat.js"></script>
+<script src="src/js/polymer/polymer.concat.js"></script>
+<link rel="import" href="src/js/polymer/polymer-body.html">
+-->
+
+<!-- Teach dart2js about Shadow DOM polyfill objects. -->
+
+<script src="packages/polymer/src/js/use_native_dartium_shadowdom.js"></script><script src="packages/web_components/platform.js"></script>
+<!-- <link rel="import" href="../polymer-dev/polymer.html"> -->
+
+<script src="packages/polymer/src/js/polymer/polymer.js"></script><polymer-element name="polymer-body" extends="body">
+
+  <script>
+
+  // upgrade polymer-body last so that it can contain other imported elements
+  document.addEventListener('polymer-ready', function() {
+    
+    Polymer('polymer-body', Platform.mixin({
+
+      created: function() {
+        this.template = document.createElement('template');
+        var body = wrap(document).body;
+        var c$ = body.childNodes.array();
+        for (var i=0, c; (c=c$[i]); i++) {
+          if (c.localName !== 'script') {
+            this.template.content.appendChild(c);
+          }
+        }
+        // snarf up user defined model
+        window.model = this;
+      },
+
+      parseDeclaration: function(elementElement) {
+        this.lightFromTemplate(this.template);
+      }
+
+    }, window.model));
+
+  });
+
+  </script>
+
+</polymer-element><script src="packages/web_components/dart_support.js"></script><polymer-element name="graph-canvas">
+  <template>
+    <style>
+      canvas {
+        border: 1px solid #101010;
+      }
+    </style>
+    <canvas id="graph" width="800" height="600">
+    </canvas>
+  </template>
+  
+</polymer-element>
+
+    <h1>Dijkstra's shortest-path</h1>
+
+    <p style="font-size: 0.7em">
+    <a href="../dart-examples.html">&lt;&lt; Back home</a>
+    </p>
+
+    <p>This is a demo of <em>Dijksra's shortest-path</em> algoritm.
+    It includes an example of polymer component, the <code>&lt;graph-canvas&gt;
+    </code>, which allows to create graph structures using mouse, keyboard
+    shortcuts and commands. It also fetures the <b>[TODO]</b><code>
+    &lt;command-input&gt;</code> component, which provides user with an
+    terminal-like interaction experience with the Dart application.</p>
+    <p><code>&lt;graph-canvas&gt;</code> is a canvas, to which I added methods
+    neccessary to create and manipulate graph structures.</p>
+    <div>
+      <graph-canvas id="graph"></graph-canvas>
+      <p>Use <strong>CTRL</strong>-key or <strong>ALT</strong>-key to create
+      graph edges.</p>
+      <p><button id="new-directed">New directed</button> - Reset graph</p>
+      <p><button id="new-undirected">New undirected</button> - Reset graph</p>
+      <p><button id="find-path">Path</button> - Find shortest path in graph using
+      Dijkstra's algorithm</p>
+      <p><button id="reset-path">Remove path</button> - Reset path</p>
+    </div>
+    
+  
+
+<script src="dijkstra.html_bootstrap.dart.js"></script></body></html>
